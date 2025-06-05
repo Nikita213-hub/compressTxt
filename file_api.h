@@ -157,7 +157,8 @@ int compress_file(const char *input_filename, const char *output_filename) {
     }
 
     // Write compressed file with coding table
-    if (!write_compressed_file_with_table(output_filename, encoded, code_table)) {
+    int write_result = write_compressed_file_with_table(output_filename, encoded, code_table);
+    if (!write_result) {
         printf("Error writing compressed file\n");
         free_bit_buffer(encoded);
         free_code_table(code_table);
@@ -232,6 +233,8 @@ int decompress_file(const char *input_filename, const char *output_filename) {
     free_code_table(code_table);
     free_huffman_tree_with_htable(tree->root);
     free(tree);
+
+    printf("File was successfully decompressed in txt file %s\n", output_filename);
 
     return 0;
 }

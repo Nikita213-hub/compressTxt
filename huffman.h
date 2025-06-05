@@ -120,15 +120,7 @@ void free_priority_queue(PriorityQueue *queue) {
     free(queue);
 }
 
-// Build Huffman tree from hash table
-HuffmanTree* build_huffman_tree(HashTable *ht) {
-    if (!ht || ht->count == 0) return NULL;
-    
-    // Create priority queue
-    PriorityQueue *queue;
-    init_priority_queue(&queue);
-    
-    // Add all characters to the queue
+void fill_priority_queue(PriorityQueue * queue, HashTable * ht) {
     for (int i = 0; i < ht->size; i++) {
         HashNode *current = ht->buckets[i];
         while (current) {
@@ -139,9 +131,19 @@ HuffmanTree* build_huffman_tree(HashTable *ht) {
             current = current->next;
         }
     }
+}
+// Build Huffman tree from hash table
+HuffmanTree* build_huffman_tree(HashTable *ht) {
+    if (!ht || ht->count == 0) return NULL;
     
+    // Create priority queue
+    PriorityQueue *queue;
+    init_priority_queue(&queue);
+    
+    // Add all characters to the queue
+    fill_priority_queue(queue, ht);
     // Build the tree
-    while (queue->size > 1) {
+    for (; queue->size > 1; ) {
         // Get two nodes with lowest frequency
         HuffmanNode *left = get_from_queue(queue);
         HuffmanNode *right = get_from_queue(queue);
@@ -160,7 +162,7 @@ HuffmanTree* build_huffman_tree(HashTable *ht) {
         // Add the new node back to the queue
         add_to_queue(queue, internal, internal->frequency);
     }
-    
+
     // Create the tree
     HuffmanTree *tree = (HuffmanTree*)malloc(sizeof(HuffmanTree));
     if (!tree) {
